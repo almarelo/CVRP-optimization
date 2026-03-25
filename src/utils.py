@@ -44,6 +44,5 @@ def load_data(path: str):
     if len(data["distance_matrix"]) != len(data["demands"]):
         raise ValueError("Distance matrix and demands size mismatch")
 
-    if 
-
+    
     return data
