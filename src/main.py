@@ -1,5 +1,9 @@
+from src.utils import load_data
+
 def main():
-    print("It runs!")
+    #Load data from file
+    data=load_data(data/cvrp_problem_data.json)
+    print(data)
 
 if __name__ == "__main__":
     main()
