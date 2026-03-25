@@ -1,4 +1,4 @@
-from src.utils import load_data
+from utils import load_data
 
 def main():
     #Load data from file

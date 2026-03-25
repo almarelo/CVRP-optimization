@@ -1,0 +1,13 @@
+[project]
+name = "cvrp-optimization"
+version = "0.1.0"
+dependencies = [
+    "numpy",
+    "pandas",
+    "ortools",
+    "pytest"
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
