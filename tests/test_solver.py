@@ -1,6 +1,6 @@
 import unittest
 from ortools.constraint_solver import pywrapcp
-from solver import solve_cvrp, create_manager, create_routing_model, distance_callback, cost_evaluator
+from solver import solve_cvrp, create_manager, create_routing_model, cost_evaluator
 from utils import load_data
 
 def test_solver_runs():
@@ -30,21 +30,12 @@ class TestRoutingFunctions(unittest.TestCase):
     def test_create_manager(self):
         self.assertEqual(self.manager.GetNumberOfNodes(), self.num_nodes)
         self.assertEqual(self.manager.GetNumberOfVehicles(), self.num_vehicles)
-        #self.assertEqual(self.manager.Start(0), self.depot)
-        # Check start and end indices for all vehicles
-        # starting_at_depot = all(self.manager.Start(v) == self.depot for v in range(self.num_vehicles))
-        # ending_at_depot   = all(self.manager.End(v) == self.depot for v in range(self.num_vehicles))
-        # self.assertTrue(starting_at_depot)
-        # self.assertTrue(ending_at_depot)
 
     def test_create_routing_model(self):
         self.assertIsInstance(self.routing, pywrapcp.RoutingModel)
 
     def test_cost_evaluator(self):
-        def callback(from_index, to_index):
-            return distance_callback(from_index, to_index)
-
-        transit_index = cost_evaluator(self.routing, callback)
+        transit_index = cost_evaluator(self.routing, self.manager, self.distance_matrix)
         self.assertIsInstance(transit_index, int)  # should return a callback index
 
 if __name__ == "__main__":
