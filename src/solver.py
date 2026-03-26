@@ -6,24 +6,40 @@ CVRPInput = Dict[str, Any]
 CVRPModel = Dict[str, Any]
 CVRPOutput = Dict[str, Any]
 
+def create_cvrp_model(data: CVRPInput) -> CVRPModel:
+    """
+    Instantiate the routing problem from the data.
+    """
+    num_nodes = data["nodes"]["total"]
+    depot = data["nodes"]["depot"]
+    num_vehicles = data["vehicles"]["count"]
+    vehicle_capacities = [data["vehicles"]["capacity_per_vehicle"]] * num_vehicles
+    demands = data["demands"]   
+    distance_matrix = data["distance_matrix"]
 
-# Create manager
-def create_manager(num_nodes, num_vehicles, depot):
-    return pywrapcp.RoutingIndexManager(num_nodes, num_vehicles, depot)
-    
-# Create routing model
-def create_routing_model(manager):
-    return pywrapcp.RoutingModel(manager)
-    
-    
+    # Create the routing index manager.
+    manager = pywrapcp.RoutingIndexManager(num_nodes, num_vehicles, depot)
 
-#Assign the cost of every arc equal to the distance for all vehicles
-  
+    # Create Routing Model.
+    routing = pywrapcp.RoutingModel(manager)
+    
+    return {
+        "num_nodes": num_nodes,
+        "depot": depot,
+        "num_vehicles": num_vehicles,
+        "vehicle_capacities": vehicle_capacities,
+        "demands": demands,
+        "distance_matrix": distance_matrix,
+        "manager": manager,
+        "routing": routing
+    }
+
+
 def cost_evaluator(routing, manager, distance_matrix):
     """
-    Registers a nested distance callback and sets it as the arc cost for all vehicles.
+    Sets the arc costs for all vehicles and returns a distance callback index.
     """
-    # Nested callback function
+    # Nested callback function to access the distances.
     def distance_callback(from_index, to_index):
         """
         Returns the distance between two nodes.
@@ -32,42 +48,27 @@ def cost_evaluator(routing, manager, distance_matrix):
         from_node = manager.IndexToNode(from_index)
         to_node = manager.IndexToNode(to_index)
         return distance_matrix[from_node][to_node]
-    # Register the callback and set it as the arc cost
+    # Register the callback 
     transit_callback_index = routing.RegisterTransitCallback(distance_callback)
+    # Set the arc costs equal to the distances for all vehicles.
     routing.SetArcCostEvaluatorOfAllVehicles(transit_callback_index)
     return transit_callback_index
 
 
-
-def solve_cvrp(data: CVRPInput) -> CVRPOutput:
+def demand_evaluator(routing, manager, demands, vehicle_capacities):
     """
-    Solver with OR-tools
+    Sets the capacity dimension for all vehicles and returns a demand callback index.
     """
-    # Instantiate the data problem.
-    num_vehicles = data["vehicles"]["count"]
-    num_nodes = data["nodes"]["total"]
-    depot = data["nodes"]["depot"]
-    demands = data["demands"]
-    vehicle_capacities = [data["vehicles"]["capacity_per_vehicle"]] * num_vehicles
-    distance_matrix = data["distance_matrix"]
-
-    # Create the routing index manager.
-    manager = create_manager(num_nodes, num_vehicles, depot)
-
-    # Create Routing Model.
-    routing = create_routing_model(manager)
-
-    # Create and register a transit callback.
-    transit_callback_index = cost_evaluator(routing, manager, distance_matrix)
-
-    # Add Capacity constraint.
+    # Nested callback function to acces the demands.
     def demand_callback(from_index):
         """Returns the demand of the node."""
         # Convert from routing variable Index to demands NodeIndex.
         from_node = manager.IndexToNode(from_index)
         return demands[from_node]
 
+    # Register the callback.
     demand_callback_index = routing.RegisterUnaryTransitCallback(demand_callback)
+    # Add a dimension to the routing model to track the capacity of each vehicle.
     routing.AddDimensionWithVehicleCapacity(
         demand_callback_index,
         0,  # null capacity slack
@@ -75,7 +76,29 @@ def solve_cvrp(data: CVRPInput) -> CVRPOutput:
         True,  # start cumul to zero
         "Capacity",
     )
+    return demand_callback_index
 
+
+
+
+def solve_cvrp(data: CVRPInput) -> CVRPOutput:
+    """
+    Solver with OR-tools
+    """ 
+    model = create_cvrp_model(data)
+    manager = model["manager"]
+    routing = model["routing"]
+    distance_matrix = model["distance_matrix"]
+    demands = model["demands"]
+    vehicle_capacities = model["vehicle_capacities"]
+    num_vehicles = model["num_vehicles"]
+
+    # Register a transit callback for the cumulated distance of a truck in a route.
+    transit_callback_index = cost_evaluator(routing, manager, distance_matrix)
+
+    # Register a transit callback for the capacity of a truck updated based on the demands of a route.
+    demand_callback_index = demand_evaluator(routing, manager, demands, vehicle_capacities)
+    
     # Setting first solution heuristic.
     search_parameters = pywrapcp.DefaultRoutingSearchParameters()
     search_parameters.first_solution_strategy = (
