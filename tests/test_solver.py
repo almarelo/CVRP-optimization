@@ -48,7 +48,7 @@ class TestRoutingFunctions(unittest.TestCase):
 
     def test_cost_evaluator(self):
         def callback(from_index, to_index):
-            return distance_callback(from_index, to_index, self.manager, self.distance_matrix)
+            return distance_callback(from_index, to_index)
 
         transit_index = cost_evaluator(self.routing, callback)
         self.assertIsInstance(transit_index, int)  # should return a callback index
