@@ -1,0 +1,15 @@
+absl-py==2.4.0
+immutabledict==4.3.1
+iniconfig==2.3.0
+numpy==2.4.3
+ortools==9.15.6755
+packaging==26.0
+pandas==3.0.1
+pluggy==1.6.0
+protobuf==6.33.6
+Pygments==2.19.2
+pytest==9.0.2
+python-dateutil==2.9.0.post0
+six==1.17.0
+typing_extensions==4.15.0
+-e git+https://github.com/almarelo/CVRP-optimization.git@46b3c82d471b34208fce419f3d92e5243f415634#egg=UNKNOWN
