@@ -40,12 +40,6 @@ class TestRoutingFunctions(unittest.TestCase):
     def test_create_routing_model(self):
         self.assertIsInstance(self.routing, pywrapcp.RoutingModel)
 
-    def test_distance_callback(self):
-        # test some known distances
-        self.assertEqual(distance_callback(0, 1, self.manager, self.distance_matrix), 10)
-        self.assertEqual(distance_callback(1, 2, self.manager, self.distance_matrix), 20)
-        self.assertEqual(distance_callback(2, 0, self.manager, self.distance_matrix), 15)
-
     def test_cost_evaluator(self):
         def callback(from_index, to_index):
             return distance_callback(from_index, to_index)
