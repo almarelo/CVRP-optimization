@@ -32,7 +32,7 @@ The final result obtained is:
 "vehicle_loads": [92, 98],
 "success": true
 
-*(Note: `0` represents the depot, and the other numbers represent delivery locations).*
+Note: `0` represents the depot, and the other numbers represent delivery locations.
 
 ## Key Design Decisions and Assumptions
 - **Solver Choice:** I used the OR-Tools Routing Library for my solution because it is easy to use and implement while performing very well for small instances of the problem.
