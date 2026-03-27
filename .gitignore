@@ -18,3 +18,11 @@ venv/
 
 # Logs
 *.log
+
+
+# Experiments
+experiment.py
+other_solvers.py
+
+#Tests
+tests/
