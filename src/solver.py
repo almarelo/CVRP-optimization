@@ -78,7 +78,24 @@ def demand_evaluator(routing, manager, demands, vehicle_capacities):
     )
     return demand_callback_index
 
+def search_parameters(first_solution_strategy   : str, local_search_metaheuristic: str, time_limit: int) -> pywrapcp.DefaultRoutingSearchParameters:
+    """
+    Sets the search parameters for the routing model, fixed for now, to be modified later.
+    """ 
+    search_parameters = pywrapcp.DefaultRoutingSearchParameters()
 
+    # Setting first solution heuristic.
+    search_parameters.first_solution_strategy = (
+        routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC
+    )
+    # Setting local search metaheuristic.
+    search_parameters.local_search_metaheuristic = (
+        routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
+    )
+    # Setting time limit.
+    search_parameters.time_limit.FromSeconds(10)
+
+    return search_parameters
 
 
 def solve_cvrp(data: CVRPInput) -> CVRPOutput:
@@ -99,18 +116,13 @@ def solve_cvrp(data: CVRPInput) -> CVRPOutput:
     # Register a transit callback for the capacity of a truck updated based on the demands of a route.
     demand_callback_index = demand_evaluator(routing, manager, demands, vehicle_capacities)
     
-    # Setting first solution heuristic.
-    search_parameters = pywrapcp.DefaultRoutingSearchParameters()
-    search_parameters.first_solution_strategy = (
-        routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC
-    )
-    search_parameters.local_search_metaheuristic = (
-        routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
-    )
-    search_parameters.time_limit.FromSeconds(10)
+
+
+    # Get parameters
+    params = search_parameters('PATH_CHEAPEST_ARC', 'GUIDED_LOCAL_SEARCH', 10)
 
     # Solve the problem.
-    solution = routing.SolveWithParameters(search_parameters)
+    solution = routing.SolveWithParameters(params)
 
     # Return solution.
     if solution:
@@ -152,31 +164,3 @@ def solve_cvrp(data: CVRPInput) -> CVRPOutput:
         return {
             "success": False
         }
-
-def fake_solve_cvrp(data: CVRPInput) -> CVRPOutput:
-    """
-    Black-box placeholder for CVRP solver.
-    Currently just returns a dummy solution.
-    Replace this with OR-Tools logic later.
-    """
-    num_vehicles = data["vehicles"]["count"]
-    num_nodes = data["nodes"]["total"]
-    
-    # Simple dummy solution: assign each node to first vehicle in order
-    routes = [[0] + list(range(1, num_nodes)) + [0]]  # single route covering all
-    while len(routes) < num_vehicles:
-        routes.append([0, 0])  # empty routes for extra vehicles
-    vehicle_distances = [1000]
-    while len(routes) < num_vehicles:
-        vehicle_distances.append([0, 0])  # distance 0 for extra vehicles
-
-    total_distance = sum(vehicle_distances) 
-    vehicle_loads = [sum(data["demands"])] + [0]*(num_vehicles-1)
-
-    return {
-        "routes": routes,
-        "vehicle_distances": vehicle_distances,
-        "total_distance": total_distance,
-        "vehicle_loads": vehicle_loads,
-        "success": True
-    }

@@ -1,9 +1,7 @@
 from pathlib import Path
 from utils import load_data, verify_constraints 
 from solver import solve_cvrp
-from sat_solver import solve_cvrp_sat
-from greedy_solver import solve_cvrp_greedy, solve_cvrp_greedy_parallel
-#from simulated_annealing import solve_cvrp_sa
+from other_solvers import solve_cvrp_cp, solve_cvrp_greedy, solve_cvrp_greedy_parallel
 import time
  
 
