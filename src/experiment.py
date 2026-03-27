@@ -20,7 +20,7 @@ def main():
     # ---------------------------------------------------------
     start_time = time.perf_counter()
     solution1 = solve_cvrp(data)
-    print("Solution obtained by OR-Tools Routing Library -- with parametres: PATH_CHEAPEST_ARC, GUIDED_LOCAL_SEARCH, 10")
+    print("Solution obtained by OR-Tools Routing Library -- with parametres: PATH_CHEAPEST_ARC, GUIDED_LOCAL_SEARCH, 1")
     print(solution1)
     end_time = time.perf_counter()
     elapsed_time1 = end_time - start_time
