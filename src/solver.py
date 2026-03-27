@@ -83,7 +83,7 @@ def demand_evaluator(routing, manager, demands, vehicle_capacities):
 
 def solve_cvrp(data: CVRPInput) -> CVRPOutput:
     """
-    Solver with OR-tools
+    Solves CVRP with OR-Tools routing library.
     """ 
     model = create_cvrp_model(data)
     manager = model["manager"]
@@ -107,12 +107,12 @@ def solve_cvrp(data: CVRPInput) -> CVRPOutput:
     search_parameters.local_search_metaheuristic = (
         routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
     )
-    search_parameters.time_limit.FromSeconds(1)
+    search_parameters.time_limit.FromSeconds(10)
 
     # Solve the problem.
     solution = routing.SolveWithParameters(search_parameters)
 
-    # Print solution on console.
+    # Return solution.
     if solution:
         routes = []
         vehicle_distances = []

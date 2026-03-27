@@ -73,27 +73,5 @@ def verify_constraints(solution, data):
     return True
 
 
-def print_solution(solution, data):
-    print(f"Total distance: {solution['total_distance']}")
-    for vehicle_id in range(data["vehicles"]["count"]):
-        print(f"Route for vehicle {vehicle_id}:")
-        index = routing.Start(vehicle_id)
-        plan_output = ""
-        route_distance = 0
-        route_load = 0
-        while not routing.IsEnd(index):
-            node_index = manager.IndexToNode(index)
-            route_load += data["demands"][node_index]
-            plan_output += f" {node_index} ->"
-            previous_index = index
-            index = solution.Value(routing.NextVar(index))
-            route_distance += routing.GetArcCostForVehicle(
-                previous_index, index, vehicle_id
-            )
-        node_index = manager.IndexToNode(index)
-        plan_output += f" {node_index}"
-        plan_output += f"\nLoad of the route: {route_load}"
-        plan_output += f"\nDistance of the route: {route_distance}"
-        print(plan_output)
-    
+
     
