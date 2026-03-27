@@ -109,7 +109,7 @@ def solve_cvrp_cp(data: Dict[str, Any]) -> Dict[str, Any]:
     
     # Solve
     solver = cp_model.CpSolver()
-    solver.parameters.max_time_in_seconds = 10.0
+    solver.parameters.max_time_in_seconds = 5
     status = solver.Solve(model)
     
     if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):

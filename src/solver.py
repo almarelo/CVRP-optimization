@@ -80,7 +80,7 @@ def demand_evaluator(routing, manager, demands, vehicle_capacities):
 
 def search_parameters(first_solution_strategy   : str, local_search_metaheuristic: str, time_limit: int) -> pywrapcp.DefaultRoutingSearchParameters:
     """
-    Sets the search parameters for the routing model, fixed for now, to be modified later.
+    Sets the search parameters for the routing model, the search strategies are fixed for now, to be modified later.
     """ 
     search_parameters = pywrapcp.DefaultRoutingSearchParameters()
 
@@ -93,7 +93,7 @@ def search_parameters(first_solution_strategy   : str, local_search_metaheuristi
         routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
     )
     # Setting time limit.
-    search_parameters.time_limit.FromSeconds(10)
+    search_parameters.time_limit.FromSeconds(time_limit)
 
     return search_parameters
 
@@ -119,7 +119,7 @@ def solve_cvrp(data: CVRPInput) -> CVRPOutput:
 
 
     # Get parameters
-    params = search_parameters('PATH_CHEAPEST_ARC', 'GUIDED_LOCAL_SEARCH', 10)
+    params = search_parameters('PATH_CHEAPEST_ARC', 'GUIDED_LOCAL_SEARCH', 1)
 
     # Solve the problem.
     solution = routing.SolveWithParameters(params)
