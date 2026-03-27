@@ -1,0 +1,7 @@
+{
+    "routes": [[0, 5, 14, 6, 10, 9, 19, 13, 4, 3, 1, 0], [0, 11, 12, 17, 8, 7, 18, 16, 15, 20, 2, 0]],
+    "vehicle_distances": [106, 109],
+    "total_distance": 215,
+    "vehicle_loads": [92, 98],
+    "success": true
+}
