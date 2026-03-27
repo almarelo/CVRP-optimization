@@ -3,7 +3,25 @@ from utils import load_data, verify_constraints
 from solver import solve_cvrp
 from other_solvers import solve_cvrp_cp, solve_cvrp_greedy, solve_cvrp_greedy_parallel
 import time
- 
+import json
+
+def save_experiment_result(solver_name, solution, elapsed_time):
+    results_dir = Path("results")
+    results_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Custom format to keep numerical vectors (lists) on a single row
+    json_lines = []
+    json_lines.append(f'    "solver": "{solver_name}"')
+    json_lines.append(f'    "time_seconds": {elapsed_time:.4f}')
+    for k, v in solution.items():
+        if k == "status_code": 
+            continue
+        json_lines.append(f'    "{k}": {json.dumps(v)}')
+    json_str = "{\n" + ",\n".join(json_lines) + "\n}\n"
+    
+    # Append to experiment_result.json, do not overwrite previous tests
+    with open(results_dir / "experiment_result.json", "a") as f:
+        f.write(json_str)
 
 def main():
     """
@@ -25,6 +43,7 @@ def main():
     end_time = time.perf_counter()
     elapsed_time1 = end_time - start_time
     print(f"Solution obtained in {elapsed_time1:.4f} seconds\n")
+    save_experiment_result("OR-Tools Routing Library", solution1, elapsed_time1)
     
     # ---------------------------------------------------------
     # 2. OR-Tools CP-SAT Solver
@@ -38,6 +57,7 @@ def main():
     end_time = time.perf_counter()
     elapsed_time2 = end_time - start_time
     print(f"Solution obtained in {elapsed_time2:.4f} seconds\n")   
+    save_experiment_result("OR-Tools CP-SAT Solver", solution2, elapsed_time2)
 
     # ---------------------------------------------------------
     # 3. Greedy Solver (Sequential)
@@ -51,6 +71,7 @@ def main():
     end_time = time.perf_counter()
     elapsed_time3 = end_time - start_time
     print(f"Solution obtained in {elapsed_time3:.4f} seconds\n") 
+    save_experiment_result("Greedy Solver (Sequential)", solution3, elapsed_time3)
 
     # ---------------------------------------------------------
     # 4. Greedy Solver (Parallel)
@@ -64,6 +85,7 @@ def main():
     end_time = time.perf_counter()
     elapsed_time4 = end_time - start_time
     print(f"Solution obtained in {elapsed_time4:.4f} seconds\n")   
+    save_experiment_result("Greedy Solver (Parallel)", solution4, elapsed_time4)
 
 if __name__ == "__main__":
     main()
